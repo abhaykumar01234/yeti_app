@@ -1,0 +1,167 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --page-inline: max(calc(50vw - 600px), 1rem);
+  --darkBlue: #217093;
+  --medBlue: #4eb8dd;
+  --lightBlue: #ddf1fa;
+  --inputBG: #f3fafd;
+}
+
+body {
+  font-family: sans-serif;
+}
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container main {
+  flex-grow: 1;
+}
+
+.container header {
+  background: skyblue;
+}
+
+.container footer {
+  background: #eee;
+}
+
+.container header,
+.container footer {
+  padding: 1rem var(--page-inline);
+  min-height: 150px;
+}
+
+.container main {
+  padding: 1rem var(--page-inline);
+  background: #f2f3f4;
+  display: flex;
+}
+
+.inline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.between {
+  justify-content: space-between;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stack.g1 {
+  gap: 1rem;
+}
+
+.stack.g2 {
+  gap: 1.5rem;
+}
+
+.stack.g3 {
+  gap: 2.5rem;
+}
+
+.loginForm {
+  background: #fff;
+  padding: 1rem;
+  min-width: 400px;
+  margin-inline: auto;
+  border: solid 1px #ddd;
+  border-radius: 0.5em;
+}
+
+.field label {
+  color: var(--darkBlue);
+  font-weight: 700;
+  font-size: 14px;
+  user-select: none;
+  cursor: pointer;
+}
+
+.field input[type="checkbox"],
+.field input[type="radio"] {
+  accent-color: var(--darkBlue);
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.field input:not([type="checkbox"]) {
+  border-radius: 4px;
+  border: 2px solid var(--darkBlue);
+  outline: none;
+  background: var(--inputBG);
+  width: 100%;
+  padding: 1rem 0.5rem;
+  font-size: 1rem;
+  transition: box-shadow 0.2s linear, border-color 0.25s ease-out;
+}
+
+.field input::placeholder {
+  color: var(--darkBlue);
+}
+
+.field input:focus {
+  outline: none;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+  border: solid 2px var(--medBlue);
+}
+
+.field {
+  position: relative;
+}
+
+/* .field .helper {
+  position: absolute;
+  top: 40px;
+  left: 0.5rem;
+  font-size: 1rem;
+  pointer-events: none;
+  color: var(--darkBlue);
+  transform-origin: top left;
+  transition: transform 0.3s ease-in-out;
+}
+
+.field input:focus + .helper,
+.field input.isNotEmpty + .helper {
+  transform: scale(0.6) translateY(-22px);
+} */
+
+button {
+  border: none;
+  outline: none;
+  border-radius: 4px;
+  background-color: var(--medBlue);
+  color: #fff;
+  padding: 1rem 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  transition: background-color 0.2s ease-out;
+}
+
+button:hover,
+button:active {
+  background-color: var(--darkBlue);
+}
+
+.yetiLogo {
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2.5px solid var(--darkBlue);
+  width: 200px;
+  height: 200px;
+  margin-inline: auto;
+}
