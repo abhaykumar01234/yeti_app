@@ -124,22 +124,6 @@ body {
   position: relative;
 }
 
-/* .field .helper {
-  position: absolute;
-  top: 40px;
-  left: 0.5rem;
-  font-size: 1rem;
-  pointer-events: none;
-  color: var(--darkBlue);
-  transform-origin: top left;
-  transition: transform 0.3s ease-in-out;
-}
-
-.field input:focus + .helper,
-.field input.isNotEmpty + .helper {
-  transform: scale(0.6) translateY(-22px);
-} */
-
 button {
   border: none;
   outline: none;

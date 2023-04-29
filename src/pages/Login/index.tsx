@@ -1,11 +1,11 @@
 import { useId, useRef, useEffect } from "react";
 import { FormField } from "../../components/FormField";
 import { YetiLogo, type YetiLogoRef } from "./YetiLogo";
+import { FormFieldInline } from "../../components/FormFieldInline";
 
 export const Login = () => {
   const id = useId();
   const emailRef = useRef<HTMLInputElement>(null);
-  const passwordRef = useRef<HTMLInputElement>(null);
   const logoRef = useRef<YetiLogoRef>(null);
 
   useEffect(() => {
@@ -15,6 +15,11 @@ export const Login = () => {
     setTimeout(() => {
       if (logoRef.current) logoRef.current.startBlinking(5);
     }, 500);
+
+    const yetiLogoRef = logoRef.current;
+    return () => {
+      yetiLogoRef.stopBlinking();
+    };
   }, []);
 
   return (
@@ -29,33 +34,35 @@ export const Login = () => {
         placeholder="email@domain.com"
         autoComplete="off"
         ref={emailRef}
-        onFocus={() => logoRef.current?.onEmailFocus()}
+        onFocus={() => {
+          if (logoRef.current?.areEyesCovered) logoRef.current.uncoverEyes();
+          logoRef.current?.onEmailFocus();
+        }}
         onBlur={() => logoRef.current?.resetFace()}
         onInput={() => logoRef.current?.onEmailInput()}
       />
+
       <FormField
         id={id + "password"}
         label="Password"
         type="password"
-        ref={passwordRef}
         required
         onFocus={() => logoRef.current?.coverEyes()}
-        onBlur={() => {
-          // if (document.activeElement !== document.querySelector("#togglePass"))
-          logoRef.current?.uncoverEyes();
-        }}
-        onTogglePasswordBlur={() => {
-          // setTimeout(() => {
-          //   if (document.activeElement !== passwordRef.current)
-          //     logoRef.current?.uncoverEyes();
-          // }, 500);
-        }}
+        onBlur={() => logoRef.current?.uncoverEyes()}
+        onTogglePasswordFocus={() => logoRef.current?.coverEyes()}
+        onTogglePasswordBlur={() => logoRef.current?.uncoverEyes()}
         onShowPasswordToggle={(showing) => {
-          logoRef.current?.coverEyes();
           if (showing) logoRef.current?.spreadFingers();
           else logoRef.current?.closeFingers();
         }}
       />
+
+      <FormFieldInline
+        id={id + "remember"}
+        label="Remember Me"
+        type="checkbox"
+      />
+
       <button type="submit">Log In</button>
     </form>
   );

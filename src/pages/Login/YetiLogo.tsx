@@ -1,17 +1,19 @@
-import gsap, { Quad, Expo, Power2 } from "gsap";
-import { MorphSVGPlugin } from "gsap-trial/MorphSVGPlugin";
 import {
   useState,
-  useRef,
   useEffect,
-  RefObject,
-  forwardRef,
   useImperativeHandle,
+  useRef,
+  forwardRef,
+  RefObject,
 } from "react";
-// import { ReactComponent as YetiSvg } from "./yeti.svg";
 import { getAngle, getPosition, getRandomInt } from "./utils";
+import gsap, { Quad, Expo, Power2 } from "gsap";
+import { MorphSVGPlugin } from "gsap-trial/MorphSVGPlugin";
+
+const IS_MORPHING_ENABLED = import.meta.env.IS_MORPHING_ENABLED; //process.env
 
 export interface YetiLogoRef {
+  areEyesCovered: boolean;
   initFace: () => void;
   startBlinking: (delay?: number) => void;
   stopBlinking: () => void;
@@ -22,6 +24,12 @@ export interface YetiLogoRef {
   uncoverEyes: () => void;
   spreadFingers: () => void;
   closeFingers: () => void;
+}
+
+enum Size {
+  Small = "small",
+  Medium = "medium",
+  Large = "large",
 }
 
 interface YetiLogoProps {
@@ -35,9 +43,10 @@ export const YetiLogo = forwardRef<YetiLogoRef, YetiLogoProps>(
     const [eyesCovered, setEyesCovered] = useState(false);
     const [blinking, setBlinking] = useState<gsap.core.Tween | null>(null);
     const [eyeScale, setEyeScale] = useState(1);
+    const [mouthSize, setMouthSize] = useState<Size>(Size.Small);
 
     useEffect(() => {
-      gsap.registerPlugin(MorphSVGPlugin);
+      if (IS_MORPHING_ENABLED) gsap.registerPlugin(MorphSVGPlugin);
     }, []);
 
     useImperativeHandle(
@@ -46,6 +55,7 @@ export const YetiLogo = forwardRef<YetiLogoRef, YetiLogoProps>(
         if (!yetiRef.current) {
           console.log("ref not found", yetiRef.current, emailRef.current);
           return {
+            areEyesCovered: eyesCovered,
             initFace: () => null,
             startBlinking: () => null,
             stopBlinking: () => null,
@@ -67,14 +77,6 @@ export const YetiLogo = forwardRef<YetiLogoRef, YetiLogoProps>(
         const eyeR = yetiRef.current.querySelector(".eyeR");
         const nose = yetiRef.current.querySelector(".nose");
         const mouth = yetiRef.current.querySelector(".mouth");
-        const mouthBG = yetiRef.current.querySelector(".mouthBG");
-        const mouthSmallBG = yetiRef.current.querySelector(".mouthSmallBG");
-        const mouthMediumBG = yetiRef.current.querySelector(".mouthMediumBG");
-        const mouthLargeBG = yetiRef.current.querySelector(".mouthLargeBG");
-        const mouthMaskPath = yetiRef.current.querySelector("#mouthMaskPath");
-        const mouthOutline = yetiRef.current.querySelector(".mouthOutline");
-        const tooth = yetiRef.current.querySelector(".tooth");
-        const tongue = yetiRef.current.querySelector(".tongue");
         const chin = yetiRef.current.querySelector(".chin");
         const face = yetiRef.current.querySelector(".face");
         const eyebrow = yetiRef.current.querySelector(".eyebrow");
@@ -83,6 +85,20 @@ export const YetiLogo = forwardRef<YetiLogoRef, YetiLogoProps>(
         const earHairL = yetiRef.current.querySelector(".earL .earHair");
         const earHairR = yetiRef.current.querySelector(".earR .earHair");
         const hair = yetiRef.current.querySelector(".hair");
+        const mouthBG = yetiRef.current.querySelector(".mouthBG");
+        const mouthSmallBG = yetiRef.current.querySelector(
+          ".mouthSmallBG"
+        ) as SVGPathElement;
+        const mouthMediumBG = yetiRef.current.querySelector(
+          ".mouthMediumBG"
+        ) as SVGPathElement;
+        const mouthLargeBG = yetiRef.current.querySelector(
+          ".mouthLargeBG"
+        ) as SVGPathElement;
+        const mouthMaskPath = yetiRef.current.querySelector("#mouthMaskPath");
+        const mouthOutline = yetiRef.current.querySelector(".mouthOutline");
+        const tooth = yetiRef.current.querySelector(".tooth");
+        const tongue = yetiRef.current.querySelector(".tongue");
         const bodyBG = yetiRef.current.querySelector(
           ".bodyBGnormal"
         ) as SVGPathElement;
@@ -285,6 +301,85 @@ export const YetiLogo = forwardRef<YetiLogoRef, YetiLogoProps>(
 
         const onEmailInput = () => {
           calculateFaceMove();
+          const value = emailRef.current?.value || "";
+          const curEmailIndex = value.length;
+
+          if (curEmailIndex > 0) {
+            if (mouthSize === Size.Small) {
+              setMouthSize(Size.Medium);
+              if (IS_MORPHING_ENABLED)
+                gsap.to([mouthBG, mouthOutline, mouthMaskPath], {
+                  duration: 1,
+                  morphSVG: mouthMediumBG,
+                  shapeIndex: 8,
+                  ease: Expo.easeOut,
+                });
+              gsap.to(tooth, { duration: 1, x: 0, y: 0, ease: Expo.easeOut });
+              gsap.to(tongue, { duration: 1, x: 0, y: 1, ease: Expo.easeOut });
+              gsap.to([eyeL, eyeR], {
+                duration: 1,
+                scaleX: 0.85,
+                scaleY: 0.85,
+                ease: Expo.easeOut,
+              });
+              setEyeScale(0.85);
+            }
+
+            if (value.includes("@")) {
+              setMouthSize(Size.Large);
+              if (IS_MORPHING_ENABLED)
+                gsap.to([mouthBG, mouthOutline, mouthMaskPath], {
+                  duration: 1,
+                  morphSVG: mouthLargeBG,
+                  ease: Expo.easeOut,
+                });
+              gsap.to(tooth, { duration: 1, x: 3, y: -2, ease: Expo.easeOut });
+              gsap.to(tongue, { duration: 1, y: 2, ease: Expo.easeOut });
+              gsap.to([eyeL, eyeR], {
+                duration: 1,
+                scaleX: 0.65,
+                scaleY: 0.65,
+                ease: Expo.easeOut,
+                transformOrigin: "center center",
+              });
+              setEyeScale(0.65);
+            } else {
+              setMouthSize(Size.Medium);
+              if (IS_MORPHING_ENABLED)
+                gsap.to([mouthBG, mouthOutline, mouthMaskPath], {
+                  duration: 1,
+                  morphSVG: mouthMediumBG,
+                  ease: Expo.easeOut,
+                });
+              gsap.to(tooth, { duration: 1, x: 0, y: 0, ease: Expo.easeOut });
+              gsap.to(tongue, { duration: 1, x: 0, y: 1, ease: Expo.easeOut });
+              gsap.to([eyeL, eyeR], {
+                duration: 1,
+                scaleX: 0.85,
+                scaleY: 0.85,
+                ease: Expo.easeOut,
+              });
+              setEyeScale(0.85);
+            }
+          } else {
+            setMouthSize(Size.Small);
+            if (IS_MORPHING_ENABLED)
+              gsap.to([mouthBG, mouthOutline, mouthMaskPath], {
+                duration: 1,
+                morphSVG: mouthSmallBG,
+                shapeIndex: 9,
+                ease: Expo.easeOut,
+              });
+            gsap.to(tooth, { duration: 1, x: 0, y: 0, ease: Expo.easeOut });
+            gsap.to(tongue, { duration: 1, y: 0, ease: Expo.easeOut });
+            gsap.to([eyeL, eyeR], {
+              duration: 1,
+              scaleX: 1,
+              scaleY: 1,
+              ease: Expo.easeOut,
+            });
+            setEyeScale(1);
+          }
         };
 
         const resetFace = () => {
@@ -333,9 +428,10 @@ export const YetiLogo = forwardRef<YetiLogoRef, YetiLogoProps>(
         };
 
         const startBlinking = (delay?: number) => {
+          const blinkDelay = delay ? getRandomInt(delay) : 1;
           const blinking = gsap.to([eyeL, eyeR], {
             duration: 0.1,
-            delay: delay ? getRandomInt(delay) : 1,
+            delay: blinkDelay,
             scaleY: 0,
             yoyo: true,
             repeat: 1,
@@ -393,7 +489,7 @@ export const YetiLogo = forwardRef<YetiLogoRef, YetiLogoProps>(
             ease: Quad.easeOut,
             delay: 0.1,
           });
-          if (bodyBG && bodyBGchanged)
+          if (IS_MORPHING_ENABLED)
             gsap.to(bodyBG, {
               duration: 0.45,
               morphSVG: bodyBGchanged,
@@ -421,12 +517,13 @@ export const YetiLogo = forwardRef<YetiLogoRef, YetiLogoProps>(
               gsap.set([armL, armR], { visibility: "hidden" });
             },
           });
-          if (bodyBG && bodyBGchanged)
+          if (IS_MORPHING_ENABLED)
             gsap.to(bodyBG, 0.45, { morphSVG: bodyBG, ease: Quad.easeOut });
           setEyesCovered(false);
         };
 
         return {
+          areEyesCovered: eyesCovered,
           initFace,
           startBlinking,
           stopBlinking,
@@ -445,7 +542,6 @@ export const YetiLogo = forwardRef<YetiLogoRef, YetiLogoProps>(
 
     return (
       <div className="yetiLogo" ref={yetiRef}>
-        {/* <YetiSvg /> */}
         <svg
           className="mySVG"
           xmlns="http://www.w3.org/2000/svg"

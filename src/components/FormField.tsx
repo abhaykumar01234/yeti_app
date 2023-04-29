@@ -1,6 +1,5 @@
 import type { ReactNode, HTMLInputTypeAttribute, ForwardedRef } from "react";
 import { forwardRef, useState } from "react";
-import { FormFieldInline } from "./FormFieldInline";
 
 interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id: string;
@@ -30,26 +29,27 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
         <div className="inline between">
           <label htmlFor={id}>{label}</label>
           {type === "password" && (
-            <FormFieldInline
-              id="togglePass"
-              name="togglePass"
-              label={inputType === "password" ? "Show" : "Hide"}
-              type="checkbox"
-              checked={inputType === "password"}
-              onChange={() =>
-                setInputType((t) => {
-                  if (typeof onShowPasswordToggle === "function")
-                    onShowPasswordToggle(t === "password");
-                  return t === "text" ? "password" : "text";
-                })
-              }
-              onFocus={onTogglePasswordFocus}
-              onBlur={onTogglePasswordBlur}
-            />
+            <div className="field inline" style={{ minWidth: 60 }}>
+              <input
+                type="checkbox"
+                id={id + "Toggle"}
+                checked={inputType === "password"}
+                onChange={() =>
+                  setInputType((t) => {
+                    if (typeof onShowPasswordToggle === "function")
+                      onShowPasswordToggle(t === "password");
+                    return t === "text" ? "password" : "text";
+                  })
+                }
+                onFocus={onTogglePasswordFocus}
+                onBlur={onTogglePasswordBlur}
+                tabIndex={-1}
+              />
+              <label>{inputType === "password" ? "Show" : "Hide"}</label>
+            </div>
           )}
         </div>
         <input type={inputType} id={id} ref={ref} {...restProps} />
-        {/* {helper ? <p className="helper">{helper}</p> : <></>} */}
       </div>
     );
   }

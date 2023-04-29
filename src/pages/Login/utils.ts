@@ -17,7 +17,7 @@ export const getPosition = (el: HTMLElement): { x: number; y: number } => {
   let yPos = 0;
 
   while (el) {
-    if (el.tagName == "BODY") {
+    if (el.tagName === "BODY") {
       // deal with browser quirks with body/window/document and page scroll
       const xScroll = el.scrollLeft || document.documentElement.scrollLeft;
       const yScroll = el.scrollTop || document.documentElement.scrollTop;
